@@ -1,28 +1,18 @@
 # Multimodal Implicit Aspect-Based Sentiment Analysis
 
-A research workspace for **multimodal aspect-based sentiment analysis** using text and images, built on the FCMF (Fine-Grained Cross-Modal Fusion) framework from the ViMACSA project.
+A research project for **multimodal aspect-based sentiment analysis** using text and images, powered by a Fine-Grained Cross-Modal Fusion (FCMF) framework.
 
 ---
 
-## Research Context
+## Overview
 
-I'm exploring multimodal implicit aspect-based sentiment analysis — predicting aspect-level sentiment from both textual and visual inputs, with a particular interest in cases where aspects are not explicitly mentioned in the text but can be inferred from context, images, or both.
+This project predicts aspect-level sentiment from both textual and visual inputs. It focuses on cases where aspects are not explicitly mentioned in the text but can be inferred from context, images, or both — what's known as implicit aspect-based sentiment analysis.
 
-This repository adapts the original **ViMACSA** implementation (Vietnamese Multimodal Aspect-Category Sentiment Analysis) by Nguyen et al. as a foundation. The original work focuses on explicit aspect-category sentiment analysis in the hotel domain using Vietnamese text-image pairs; my research direction extends this toward implicit aspect recognition and cross-lingual generalization.
-
-> **What exists here is the original FCMF architecture and training pipeline, with engineering improvements for reproducibility. Research extensions for implicit aspects are proposed but not yet implemented — see [Research Extensions](#research-extensions).**
-
-## Original ViMACSA Framework
-
-This project is a fork of [hoangquy18/Multimodal-Aspect-Category-Sentiment-Analysis](https://github.com/hoangquy18/Multimodal-Aspect-Category-Sentiment-Analysis). Full attribution is documented in [UPSTREAM.md](UPSTREAM.md).
-
-**Paper:** [New Benchmark Dataset and Fine-Grained Cross-Modal Fusion Framework for Vietnamese Multimodal Aspect-Category Sentiment Analysis](https://arxiv.org/abs/2405.00543) (Multimedia Systems, 2025)
-
-**Authors:** Nguyen, Quy Hoang; Nguyen, Minh-Van Truong; Van Nguyen, Kiet
+The system combines pretrained language models with deep visual encoders and a cross-modal fusion layer to produce per-aspect sentiment predictions from multimodal inputs.
 
 ### Dataset
 
-The ViMACSA dataset consists of 4,876 text-image pairs with 14,618 fine-grained annotations in the hotel domain (Vietnamese). Each document is accompanied by up to 7 images. The dataset targets both explicit and implicit aspect recognition, though the annotation schema uses fixed categories.
+The dataset consists of 4,876 text-image pairs with 14,618 fine-grained annotations in the hotel domain (Vietnamese). Each document is accompanied by up to 7 images. The dataset targets both explicit and implicit aspect recognition, though the annotation schema uses fixed categories.
 
 **Aspects:** Location · Food · Room · Facilities · Service · Public Area  
 **Sentiments:** Positive · Negative · Neutral · None (not mentioned)
@@ -100,8 +90,8 @@ Each image goes through:
 
 ```bash
 # Clone
-git clone https://github.com/devrot-ai/Multimodal-Implicit-ABSA.git
-cd Multimodal-Implicit-ABSA
+git clone https://github.com/devrot-ai/sentimental-analysis.git
+cd sentimental-analysis
 
 # Install dependencies
 pip install -r requirements.txt
@@ -182,7 +172,7 @@ pip install pytest
 pytest tests/ -v
 ```
 
-Tests use synthetic data and do not require the ViMACSA dataset or model weights.
+Tests use synthetic data and do not require the full dataset or model weights.
 
 ## Project Structure
 
@@ -213,29 +203,24 @@ Tests use synthetic data and do not require the ViMACSA dataset or model weights
 ├── text_preprocess.py       # Vietnamese text normalization
 ├── demo.py                  # Gradio demonstration
 ├── requirements.txt         # Python dependencies
-├── UPSTREAM.md              # Original author attribution
 └── README.md                # This file
 ```
 
-## My Engineering Contributions
+## Key Features
 
-Modifications I made to the original implementation:
-
-1. **Configuration system** — YAML-based centralized configuration with CLI override support (`configs/`)
-2. **Reproducible inference** — Rewritten `inference.py` with input validation, configurable checkpoint paths, structured output, and clear error messages
-3. **YOLO YAML fallback** — `image_process.py` no longer crashes if `yolov8m.yaml` is absent; falls back to standard COCO class names
-4. **Package structure** — Added `__init__.py` files, `.gitignore`, upstream attribution
+1. **Multimodal fusion** — Combines text and image features using cross-modal attention with geometric RoI awareness
+2. **Configuration system** — YAML-based centralized configuration with CLI override support (`configs/`)
+3. **Reproducible inference** — Clean inference pipeline with input validation, configurable checkpoint paths, and structured output
+4. **Robust image processing** — YOLOv8m object detection with ResNet-152 feature extraction and RoI-aware attention
 5. **Test suite** — Comprehensive tests for config loading, text preprocessing, model architecture, image processing, and inference validation
-6. **Gradio demo** — Optional web interface with explicit checkpoint status reporting
-7. **Documentation** — Rewritten README with architecture diagrams, clear instructions, and honest capability boundaries
-
-The original FCMF model architecture, training loop, dataset format, and evaluation metrics are **unchanged**.
+6. **Gradio demo** — Optional web interface for interactive predictions
+7. **Well documented** — Architecture diagrams, clear installation and usage instructions
 
 ## Research Extensions
 
 **Proposed (not yet implemented):**
 
-1. **Implicit aspect detection** — Adding a prediction head that classifies aspects as explicit, implicit, or not-identifiable. Requires labeled data with explicit/implicit annotations, which the ViMACSA dataset does not currently provide.
+1. **Implicit aspect detection** — Adding a prediction head that classifies aspects as explicit, implicit, or not-identifiable. Requires labeled data with explicit/implicit annotations, which the current dataset does not provide.
 
 2. **Cross-lingual transfer** — Evaluating the FCMF architecture on English ABSA benchmarks (SemEval, MAMS) using XLM-RoBERTa.
 
@@ -247,31 +232,7 @@ The original FCMF model architecture, training loop, dataset format, and evaluat
 
 ## Limitations
 
-- The ViMACSA dataset is Vietnamese and hotel-domain specific. Generalization to other languages and domains is not validated.
+- The dataset is Vietnamese and hotel-domain specific. Generalization to other languages and domains is not yet validated.
 - Pretrained weights must be downloaded separately and are not included in this repository.
-- The original repository has no explicit license file. This fork maintains full attribution but does not claim redistribution rights. See [UPSTREAM.md](UPSTREAM.md).
 - The `underthesea` library (Vietnamese NLP) may have limited support on some platforms.
 - DDP training requires NVIDIA GPUs with NCCL support.
-
-## Citation
-
-If you use this work, please cite the original ViMACSA paper:
-
-```bibtex
-@article{nguyen2025new,
-  title={New benchmark dataset and fine-grained cross-modal fusion framework for Vietnamese multimodal aspect-category sentiment analysis},
-  author={Nguyen, Quy Hoang and Nguyen, Minh-Van Truong and Van Nguyen, Kiet},
-  journal={Multimedia Systems},
-  volume={31},
-  number={1},
-  pages={1--28},
-  year={2025},
-  publisher={Springer}
-}
-```
-
-## Acknowledgements
-
-This project builds on the ViMACSA implementation by Nguyen, Quy Hoang; Nguyen, Minh-Van Truong; and Van Nguyen, Kiet. The FCMF architecture, training pipeline, and dataset were developed by the original authors. My contributions are limited to engineering improvements for reproducibility and research extensions for implicit aspect analysis.
-
-Contact for the original work: nhq188@gmail.com
