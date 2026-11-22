@@ -2,6 +2,8 @@
 
 A research project for **multimodal aspect-based sentiment analysis** using text and images, powered by a Fine-Grained Cross-Modal Fusion (FCMF) framework.
 
+**Author:** Kanishk Chhoker
+
 ---
 
 ## Overview
@@ -236,3 +238,8 @@ Tests use synthetic data and do not require the full dataset or model weights.
 - Pretrained weights must be downloaded separately and are not included in this repository.
 - The `underthesea` library (Vietnamese NLP) may have limited support on some platforms.
 - DDP training requires NVIDIA GPUs with NCCL support.
+
+## Project Ownership
+
+This repository and its implementation adaptations are maintained by **Kanishk Thakur (`devrot-ai`)**.
+The original ViMACSA model and dataset provenance are documented in [UPSTREAM.md](UPSTREAM.md).
