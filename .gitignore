@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data and model artifacts (DO NOT commit)
+data/
+checkpoints/*.pth
+checkpoints/*.pt
+outputs/
+*.pth
+*.pt
+!configs/*.yaml
+
+# YOLO weights
+yolov8*.pt
+yolov8*.yaml
+
+# Images (keep examples/)
+# images/ is kept for README assets
+
+# Logs
+*.log
+file_*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets
+.env
+*.key
+*.secret

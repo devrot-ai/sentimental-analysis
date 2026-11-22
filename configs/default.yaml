@@ -1,0 +1,53 @@
+# ViMACSA / FCMF — Default Configuration
+# Override any value via CLI arguments or a custom YAML file.
+
+# --- Paths ---
+data_dir: "./data"                    # Directory containing train.json, dev.json, test.json, roi_data.csv
+image_dir: "./data/image"             # Directory containing the actual image files
+output_dir: "./outputs"               # Training outputs (checkpoints, logs, results)
+checkpoint_dir: "./checkpoints"       # Pretrained / saved model checkpoints
+
+# --- Model ---
+pretrained_model: "vinai/phobert-base"  # HuggingFace model for text encoding
+                                        # Options: vinai/phobert-base, vinai/phobert-base-v2,
+                                        #          xlm-roberta-base, xlm-roberta-large, uitnlp/visobert
+
+# --- Dataset ---
+list_aspect:
+  - Location
+  - Food
+  - Room
+  - Facilities
+  - Service
+  - Public_area
+
+num_polarity: 4                       # None, Negative, Neutral, Positive
+num_imgs: 7                           # Maximum number of images per sample
+num_rois: 4                           # Number of RoIs per image
+max_seq_length: 170                   # Maximum tokenizer sequence length
+
+# --- Training ---
+train_batch_size: 8
+eval_batch_size: 8
+learning_rate: 3.0e-5
+num_train_epochs: 8
+warmup_proportion: 0.1
+gradient_accumulation_steps: 2
+seed: 42
+
+# --- Hardware ---
+device: "auto"                        # "auto", "cuda", "cpu"
+fp16: true
+ddp: false                            # Set true for multi-GPU with torchrun
+num_workers: 0                        # DataLoader workers (0 = main process)
+
+# --- Image Processing ---
+image_size: 224                       # Input image dimension (H=W)
+roi_merge_epsilon: 30                 # Epsilon for YOLO box merging
+
+# --- Inference ---
+yolo_model_path: "./checkpoints/yolov8m.pt"
+weight_roi_path: "./checkpoints/weight_roi_resnet152.pth"
+weight_image_path: "./checkpoints/weight_image_resnet152.pth"
+fcmf_checkpoint: "./checkpoints/fcmf_model.pth"
+visual_model_checkpoint: "./checkpoints/visual_model.pth"

@@ -1,3 +1,4 @@
+import os
 import torch
 from text_preprocess import *
 from vimacsa_dataset import *
@@ -45,37 +46,40 @@ def load_model(path):
 def main():
     parser = argparse.ArgumentParser()
 
+    # Configuration file
+    parser.add_argument("--config", type=str, default=None,
+                        help="Path to YAML configuration file. CLI arguments override config values.")
+
     parser.add_argument("--data_dir",
-                        default='../vimacsa',
+                        default=None,
                         type=str,
-                        required=True,
-                        help="The input data dir. Should contain the .csv files (or other data files) for the MACSA task.")
+                        help="The input data dir. Should contain the .csv files (or other data files) for the MACSA task. "
+                             "Default: from config or ./data")
     parser.add_argument("--list_aspect", 
                         "--names-list", 
-                        default=['Location', 'Food', 'Room', 'Facilities', 'Service', 'Public_area'],
+                        default=None,
                         nargs='+', help = "List of predefined Aspect.")
     parser.add_argument("--num_polarity",
-                        default=4,
+                        default=None,
                         type=int,
                         help="Number of sentiment polarity.")
     parser.add_argument("--num_imgs",
-                    default=7,
+                    default=None,
                     type=int,
                     help="Number of images.")
     parser.add_argument("--num_rois",
-                    default=4,
+                    default=None,
                     type=int,
                     help="Number of RoIs.")
-    parser.add_argument('--image_dir', default='../vimacsa/image', help='path to images')
+    parser.add_argument('--image_dir', default=None, help='path to images')
 
-    parser.add_argument("--pretrained_model", default=None, type=str, required=True,
+    parser.add_argument("--pretrained_model", default=None, type=str,
                     help="Pre-trained model selected in the list: vinai/phobert-base, "
                     "vinai/phobert-base-v2, xlm-roberta-base, xlm-roberta-large, uitnlp/visobert")
     
     parser.add_argument("--output_dir",
                     default=None,
                     type=str,
-                    required=True,
                     help="The output directory where the model predictions and checkpoints will be written.")
     
     ## Other parameters
@@ -135,7 +139,43 @@ def main():
 
     args = parser.parse_args()
 
+    # --- Load YAML config and merge CLI overrides ---
+    from configs import get_config
+    config = get_config(config_path=args.config, cli_args=args)
 
+    # Apply config values to args where CLI did not provide them
+    if args.data_dir is None:
+        args.data_dir = config.get("data_dir", "./data")
+    if args.image_dir is None:
+        args.image_dir = config.get("image_dir", "./data/image")
+    if args.output_dir is None:
+        args.output_dir = config.get("output_dir", "./outputs")
+    if args.pretrained_model is None:
+        args.pretrained_model = config.get("pretrained_model", "vinai/phobert-base")
+    if args.list_aspect is None:
+        args.list_aspect = config.get("list_aspect", ["Location", "Food", "Room", "Facilities", "Service", "Public_area"])
+    if args.num_polarity is None:
+        args.num_polarity = config.get("num_polarity", 4)
+    if args.num_imgs is None:
+        args.num_imgs = config.get("num_imgs", 7)
+    if args.num_rois is None:
+        args.num_rois = config.get("num_rois", 4)
+    if args.max_seq_length is None:
+        args.max_seq_length = config.get("max_seq_length", 170)
+    if args.train_batch_size is None:
+        args.train_batch_size = config.get("train_batch_size", 8)
+    if args.eval_batch_size is None:
+        args.eval_batch_size = config.get("eval_batch_size", 8)
+    if args.learning_rate is None:
+        args.learning_rate = config.get("learning_rate", 3e-5)
+    if args.num_train_epochs is None:
+        args.num_train_epochs = config.get("num_train_epochs", 8)
+    if args.warmup_proportion is None:
+        args.warmup_proportion = config.get("warmup_proportion", 0.1)
+    if args.seed is None:
+        args.seed = config.get("seed", 42)
+    if args.gradient_accumulation_steps is None:
+        args.gradient_accumulation_steps = config.get("gradient_accumulation_steps", 1)
 
     if args.no_cuda:
         device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
